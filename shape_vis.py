@@ -37,6 +37,55 @@ def compute_sqr_dist(healthy_spd, schiz_spd, n):
             sqrd_dist.append(spd_bures.squared_dist(healthy_spd[i], schiz_spd[j]))
     return sqrd_dist
 
+def compute_log(healthy_spd, schiz_spd, n):
+    """Compute the log of SPD matrices.
+        
+    Compute the log between all 
+    combinations of healthy SPD matrices and 
+    schizophrenic SPD matrices.
+
+    Parameters
+    ----------
+    healthy_spd : array-like, shape=[..., n, n]
+        Point.
+    schiz_spd : array-like, shape=[..., n, n]
+        Point.
+    n : int
+        Size of matrix.
+
+    Returns
+    -------
+    log_vec : array-like, shape=[..., n, n]
+        Log of all SPD combinations.
+    """
+    log_vec = np.zeros((healthy_spd.shape[0]*schiz_spd.shape[0], n, n))
+    spd_bures = SPDBuresWassersteinMetric(n)
+    k = 0
+    for i in range(len(healthy_spd[:])):
+        for j in range(len(schiz_spd[:])):
+            log_vec[k] = (spd_bures.log(healthy_spd[i], schiz_spd[j]))
+            k += 1
+    return log_vec
+
+def plot_SPD_image(SPD, subgraph_id, title):
+    """Plots SPD matrix.
+    
+    Plots SPD matrix with title and appropriate subgraph.
+    
+    Parameters
+        ----------
+        SPD : array-like, shape=[..., n, n]
+            SPD matrix for plotting.
+        subgraph_id : int
+            ID for subgraph plot.
+        title : string
+            Title of plot.
+    """
+    plt.subplot(subgraph_id)
+    plt.imshow(SPD)
+    plt.title(title)
+
+    
 def plot_graphs_spatial(nx_graph, subgraph_id, title):
     """Plots spatial graphs.
     
@@ -47,7 +96,7 @@ def plot_graphs_spatial(nx_graph, subgraph_id, title):
         nx_graph : graph object
             Graph object used for plotting.
         subgraph_id : int
-            ID for subgraph plot
+            ID for subgraph plot.
         title : string
             Title of plot.
     """
@@ -66,7 +115,7 @@ def plot_graphs_spectral(nx_graph,subgraph_id,title):
         nx_graph : graph object
             Graph object used for plotting.
         subgraph_id : int
-            ID for subgraph plot
+            ID for subgraph plot.
         title : string
             Title of plot.
     """
