@@ -10,26 +10,26 @@ import numpy as np
 import numpy.linalg as npla
 
 def compute_sqr_dist(healthy_spd, schiz_spd, n):
-        """Compute the Bures-Wasserstein squared distance.
+    """Compute the Bures-Wasserstein squared distance.
         
-        Compute the Riemannian squared distance between all 
-        combinations of healthy SPD matrices and 
-        schizophrenic SPD matrices.
+    Compute the Riemannian squared distance between all 
+    combinations of healthy SPD matrices and 
+    schizophrenic SPD matrices.
 
-        Parameters
-        ----------
-        healthy_spd : array-like, shape=[..., n, n]
-            Point.
-        schiz_spd : array-like, shape=[..., n, n]
-            Point.
-        n : int
-            Size of matrix.
+    Parameters
+    ----------
+    healthy_spd : array-like, shape=[..., n, n]
+        Point.
+    schiz_spd : array-like, shape=[..., n, n]
+        Point.
+    n : int
+        Size of matrix.
 
-        Returns
-        -------
-        sqrd_dist : array-like, shape=[...]
-            Riemannian squared distance of all SPD combinations.
-        """
+    Returns
+    -------
+    sqrd_dist : array-like, shape=[...]
+        Riemannian squared distance of all SPD combinations.
+    """
     spd_bures = SPDBuresWassersteinMetric(n)
     sqrd_dist = []
     for i in range(len(healthy_spd[:])):
