@@ -1,1 +1,1 @@
-test
+Learning distributions of healthy & schizophrenic brain shapes via denoising diffusion on manifolds. Class project for ECE 594N. Marianne Arriola & Ryan Stofer.
