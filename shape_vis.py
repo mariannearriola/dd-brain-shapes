@@ -38,18 +38,20 @@ def compute_sqr_dist(healthy_spd, schiz_spd, n):
     return sqrd_dist
 
 def compute_log(healthy_spd, schiz_spd, n):
-    """Compute the log of SPD matrices.
-        
-    Compute the log between all 
-    combinations of healthy SPD matrices and 
-    schizophrenic SPD matrices.
+    """Compute the Bures-Wasserstein logarithm map.
+    
+    Compute the Riemannian logarithm at point schiz_spd,
+    of point with respect to the Bures-Wasserstein metric.
+    This gives a tangent vector at point schiz_spd.
+    This metric is computed for all combinations of healthy 
+    SPD matrices and schizophrenic SPD matrices.
 
     Parameters
     ----------
     healthy_spd : array-like, shape=[..., n, n]
         Point.
     schiz_spd : array-like, shape=[..., n, n]
-        Point.
+        Base point.
     n : int
         Size of matrix.
 
