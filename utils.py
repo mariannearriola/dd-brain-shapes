@@ -1,5 +1,47 @@
+import geomstats
+import geomstats.backend as gs
+from geomstats.geometry.spd_matrices import *
+from geomstats.geometry.stiefel import Stiefel
+from geomstats.datasets.utils import load_connectomes
+from geomstats.visualization.spd_matrices import Ellipses
+import networkx as nx
+import matplotlib.pyplot as plt
+import numpy as np
+import numpy.linalg as npla
 import torch.nn.functional as F
 import torch
+
+def get_loss(model, x_0, t, device):
+    x_noisy, noise = forward_diffusion_sample(x_0, t, device)
+    noise_pred = model(x_noisy, t)
+    return F.l1_loss(noise, noise_pred)
+
+def forward_diffusion_sample(x_0, t, sqrt_alphas_cumprod, sqrt_one_minus_alphas_cumprod, device="cpu"):
+    """ 
+    Takes an image and a timestep as input and 
+    returns the noisy version of it
+    """
+
+    betas = linear_beta_schedule(timesteps=t)
+
+    # Pre-calculate different terms for closed form
+    alphas = 1. - betas
+    alphas_cumprod = torch.cumprod(alphas, axis=0)
+    alphas_cumprod_prev = F.pad(alphas_cumprod[:-1], (1, 0), value=1.0)
+    sqrt_recip_alphas = torch.sqrt(1.0 / alphas)
+    sqrt_alphas_cumprod = torch.sqrt(alphas_cumprod)
+    sqrt_one_minus_alphas_cumprod = torch.sqrt(1. - alphas_cumprod)
+    posterior_variance = betas * (1. - alphas_cumprod_prev) / (1. - alphas_cumprod)
+
+    noise = torch.randn_like(x_0)
+    sqrt_alphas_cumprod_t = get_index_from_list(sqrt_alphas_cumprod, t, x_0.shape)
+    sqrt_one_minus_alphas_cumprod_t = get_index_from_list(
+        sqrt_one_minus_alphas_cumprod, t, x_0.shape
+    )
+    # mean + variance
+    return sqrt_alphas_cumprod_t.to(device) * x_0.to(device), \
+        sqrt_one_minus_alphas_cumprod_t.to(device) * noise.to(device), \
+        noise.to(device)
 
 def linear_beta_schedule(timesteps, start=0.0001, end=0.02):
     return torch.linspace(start, end, timesteps)
