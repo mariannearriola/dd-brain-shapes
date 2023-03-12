@@ -33,19 +33,20 @@ def plot_mats(data,noisy_mats,ncol):
 def denoise_mats(x_0,noisy_samples):
     for ind,noisy_mat in enumerate(noisy_samples):
         if ind == 0:
-            denoising_mats=unsqueeze(npla.solve(x_0,noisy_mat))
+            denoising_mats=unsqueeze(npla.solve(noisy_mat,x_0))
         else:
-            denoising_mats=gs.concatenate((denoising_mats,unsqueeze(npla.solve(noisy_samples[ind-1],noisy_mat))),axis=0)
+            denoising_mats=gs.concatenate((denoising_mats,unsqueeze(npla.solve(noisy_mat,noisy_samples[ind-1]))),axis=0)
+            #denoising_mats=gs.concatenate((denoising_mats,unsqueeze(npla.solve(noisy_mat,x_0))),axis=0)
     return denoising_mats
 
-def plot_results(test,noisy,pred):
+def plot_results(label,test,noisy,title):
     figs,axs=plt.subplots(1, 3, figsize=(9,9))
-    axs[0].imshow(test)
-    axs[0].title.set_text("Test matrix")
-    axs[1].imshow(noisy)
-    axs[1].title.set_text("Noisy matrix")
-    axs[2].imshow(pred)
-    axs[2].title.set_text("Denoised matrix")
+    axs[0].imshow(label)
+    axs[0].title.set_text(f"{title} label matrix")
+    axs[1].imshow(test)
+    axs[1].title.set_text(f"{title} test matrix")
+    axs[2].imshow(noisy)
+    axs[2].title.set_text(f"{title} noisy matrix")
     return figs
 
 def compute_sqr_dist(a, b, metric):
@@ -74,3 +75,50 @@ def compute_sqr_dist(a, b, metric):
         for j in range(len(b[:])):
             sqrd_dist.append(metric.squared_dist(a[i], b[j]))
     return sqrd_dist
+
+def linear_beta_schedule(timesteps, start=0.0001, end=0.02):
+    return gs.linspace(start, end, timesteps)
+
+'''
+def forward_diffusion_sample(x_0, shape, t, device="cpu"):
+    """ 
+    Takes an image and a timestep as input and 
+    returns the noisy version of it
+    """
+    noise = np.random.standard_normal(shape)
+    # mean + variance
+    return sqrt_alphas_cumprod[t] * x_0 \
+    + sqrt_one_minus_alphas_cumprod[t] * noise, noise
+
+# Define beta schedule
+T = 10
+betas = linear_beta_schedule(timesteps=T)
+
+# Pre-calculate different terms for closed form
+alphas = 1. - betas
+alphas_cumprod = gs.cumprod(alphas, axis=0)
+alphas_cumprod_prev = gs.pad(alphas_cumprod[:-1], (1, 0))
+alphas_cumprod_prev[0] = 1
+sqrt_recip_alphas = gs.sqrt(1.0 / alphas)
+sqrt_alphas_cumprod = gs.sqrt(alphas_cumprod)
+sqrt_one_minus_alphas_cumprod = gs.sqrt(1. - alphas_cumprod)
+posterior_variance = betas * (1. - alphas_cumprod_prev) / (1. - alphas_cumprod)
+'''
+def plot_graphs_spatial(nx_graph, subgraph_id, title):
+    """Plots spatial graphs.
+    
+    Plots graph network with title and appropriate subgraph.
+    
+    Parameters
+        ----------
+        nx_graph : graph object
+            Graph object used for plotting.
+        subgraph_id : int
+            ID for subgraph plot.
+        title : string
+            Title of plot.
+    """
+    plt.subplot(subgraph_id)
+    degrees = [n for n in nx.degree_centrality(nx_graph).values()]
+    nx.draw(nx_graph,pos=None,with_labels=False,node_color=degrees)
+    plt.title(title)
