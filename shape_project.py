@@ -21,7 +21,7 @@ from shape_project import *
 def unsqueeze(mat):
     return gs.reshape(mat,(1,mat.shape[0],mat.shape[1]))
 
-def plot_mats(noisy_mats,nrow,ncol):
+def plot_mats(noisy_mats,nrow,ncol,step):
     #figs,axs=plt.subplots(1, ncol, figsize=(20,9))
     figs,axs=plt.subplots(nrow, ncol, figsize=(20,9))
     for im_id,noisy_mat in enumerate(noisy_mats):
@@ -29,8 +29,6 @@ def plot_mats(noisy_mats,nrow,ncol):
         axs[int((im_id)/ncol)][(im_id)%ncol].title.set_text(f'T={im_id}')
         #axs[(im_id)%ncol].imshow(noisy_mat)
         #axs[(im_id)%ncol].title.set_text(f'T={im_id}')
-
-    return figs
 
 def plot_graphs(noisy_mats,nrow,ncol):
     figs,axs=plt.subplots(nrow, ncol, figsize=(20,15))
@@ -59,7 +57,6 @@ def plot_results(label,test,noisy,title):
     axs[1].title.set_text(f"{title} generated matrix")
     axs[2].imshow(label)
     axs[2].title.set_text(f"{title} label matrix")
-    return figs
 
 def compute_sqr_dist(a, b, metric):
     """Compute the Bures-Wasserstein squared distance.
