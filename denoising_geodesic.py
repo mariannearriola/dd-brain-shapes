@@ -189,15 +189,11 @@ class DenoisingGeodesic(BaseEstimator):
             base_point = intercept
             penalty = 0
         distances = 0
+
         for m in range(1,y.shape[0]+1):
             if m != (y.shape[0]-1):
-                if m == 1:
-                    to_denoise = clean[(y.shape[0]-m)]
-                else:
-                    to_denoise = pred
+                
                 model_in = np.array([X[(y.shape[0]-m)]])
-                # predict denoising matrix
-                tangent_vec = self.space.to_tangent(coef, base_point)
                 '''
                 if m == 1:
                     tangent_vec = self.space.to_tangent(coef[m-1], base_point)
@@ -205,13 +201,14 @@ class DenoisingGeodesic(BaseEstimator):
                     #logging.info(f'{coef.shape},{tangent_vec.shape},{self.space.metric.geodesic(initial_tangent_vec=tangent_vec, initial_point=base_point).shape}')
                     tangent_vec = self.space.to_tangent(coef[m-1], self.space.metric.geodesic(initial_tangent_vec=tangent_vec, initial_point=base_point)(1))
                 '''
-                if m == 1:
-                    denoisers = self._model(model_in, tangent_vec, base_point)
+                if True:
+                    tangent_vec = self.space.to_tangent(coef, base_point)
+                    denoisers = self._model(model_in, tangent_vec, base_point)[0]
                 else:
-                    denoisers = self._model(model_in, tangent_vec, denoisers[0])
-                pred = self.denoised_sample(to_denoise,denoisers)
-                #distances = self.metric.squared_dist(pred, clean[0])
-                distances = self.metric.squared_dist(denoisers[0],y[(y.shape[0]-m)])
+                    tangent_vec = self.space.to_tangent(coef, denoisers)
+                    denoisers = self._model(model_in, tangent_vec, denoisers)[0]
+                distances = self.metric.squared_dist(denoisers,clean[(y.shape[0]-m-1)])
+                #logging.info(f'distances {distances}')
         if weights is None:
             weights = 1.0
         return 1.0 / 2.0 * gs.sum(weights * distances) + penalty

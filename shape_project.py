@@ -17,17 +17,29 @@ from geomstats.geometry.lie_group import LieGroup
 from geomstats.geometry.general_linear import GeneralLinear
 from shape_project import *
 
+
 def unsqueeze(mat):
     return gs.reshape(mat,(1,mat.shape[0],mat.shape[1]))
 
-def plot_mats(data,noisy_mats,ncol):
-    T = noisy_mats.shape[0]
-    figs,axs=plt.subplots(int(math.ceil((T+1)/(1*ncol))), ncol, figsize=(20,9))
-    axs[0][0].imshow(data)
-    axs[0][0].title.set_text("Input")
+def plot_mats(noisy_mats,nrow,ncol):
+    #figs,axs=plt.subplots(1, ncol, figsize=(20,9))
+    figs,axs=plt.subplots(nrow, ncol, figsize=(20,9))
     for im_id,noisy_mat in enumerate(noisy_mats):
-        axs[int((im_id+1)/ncol)][(im_id+1)%ncol].imshow(noisy_mat)
-        axs[int((im_id+1)/ncol)][(im_id+1)%ncol].title.set_text(f'T={im_id+1}')
+        axs[int((im_id)/ncol)][(im_id)%ncol].imshow(noisy_mat)
+        axs[int((im_id)/ncol)][(im_id)%ncol].title.set_text(f'T={im_id}')
+        #axs[(im_id)%ncol].imshow(noisy_mat)
+        #axs[(im_id)%ncol].title.set_text(f'T={im_id}')
+
+    return figs
+
+def plot_graphs(noisy_mats,nrow,ncol):
+    figs,axs=plt.subplots(nrow, ncol, figsize=(20,15))
+    for im_id,noisy_mat in enumerate(noisy_mats):
+        nx_graph = nx.from_numpy_array(np.ceil(noisy_mat))
+        degrees = [n for n in nx.degree_centrality(nx_graph).values()]
+        nx.draw(nx_graph,pos=None,with_labels=False,node_color=degrees,ax=axs[int((im_id)/ncol)][(im_id)%ncol],node_size=200,width=.75)
+        axs[int((im_id)/ncol)][(im_id)%ncol].title.set_text(f'T={im_id}')
+        
     return figs
 
 def denoise_mats(x_0,noisy_samples):
@@ -40,13 +52,13 @@ def denoise_mats(x_0,noisy_samples):
     return denoising_mats
 
 def plot_results(label,test,noisy,title):
-    figs,axs=plt.subplots(1, 3, figsize=(9,9))
-    axs[0].imshow(label)
-    axs[0].title.set_text(f"{title} label matrix")
+    figs,axs=plt.subplots(1, 3, figsize=(11,9))
+    axs[0].imshow(noisy)
+    axs[0].title.set_text(f"{title} noisy matrix")
     axs[1].imshow(test)
-    axs[1].title.set_text(f"{title} test matrix")
-    axs[2].imshow(noisy)
-    axs[2].title.set_text(f"{title} noisy matrix")
+    axs[1].title.set_text(f"{title} generated matrix")
+    axs[2].imshow(label)
+    axs[2].title.set_text(f"{title} label matrix")
     return figs
 
 def compute_sqr_dist(a, b, metric):
