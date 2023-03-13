@@ -129,5 +129,5 @@ def plot_graphs_spatial(nx_graph, subgraph_id, title):
     """
     plt.subplot(subgraph_id)
     degrees = [n for n in nx.degree_centrality(nx_graph).values()]
-    nx.draw(nx_graph,pos=None,with_labels=False,node_color=degrees)
+    nx.draw(nx_graph,pos=None,with_labels=False,node_color=degrees,node_size=200,width=.75)
     plt.title(title)

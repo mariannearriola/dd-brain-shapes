@@ -208,6 +208,7 @@ class DenoisingGeodesic(BaseEstimator):
                     tangent_vec = self.space.to_tangent(coef, denoisers)
                     denoisers = self._model(model_in, tangent_vec, denoisers)[0]
                 distances = self.metric.squared_dist(denoisers,clean[(y.shape[0]-m-1)])
+                #distances = self.metric.squared_dist(tangent_vec,clean[(y.shape[0]-m-1)])
                 #logging.info(f'distances {distances}')
         if weights is None:
             weights = 1.0
